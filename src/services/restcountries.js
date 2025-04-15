@@ -26,7 +26,11 @@ export const searchCountryByName = async (name) => {
 
 // Filter by region
 export const filterByRegion = async (region) => {
-  const response = await axios.get(`${BASE_URL}/region/${region}`);
+  const response = await api.get(`/region/${region}`);
   return response.data;
 };
 
+export const filterByLanguage = async (language) => {
+  const response = await api.get(`/lang/${language}`);
+  return response.data;
+};

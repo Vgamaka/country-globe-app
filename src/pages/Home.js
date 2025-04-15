@@ -1,24 +1,40 @@
 import React, { useEffect, useState } from 'react';
-import { getAllCountries, searchCountryByName } from '../services/restcountries';
+import {
+  getAllCountries,
+  searchCountryByName,
+  filterByRegion,
+} from '../services/restcountries';
 import CountryCard from '../components/CountryCard';
 import SearchBar from '../components/SearchBar';
+import RegionFilter from '../components/RegionFilter';
+import LanguageFilter from '../components/LanguageFilter';
+import { filterByLanguage } from '../services/restcountries';
 
 const Home = () => {
   const [countries, setCountries] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedRegion, setSelectedRegion] = useState('');
   const [loading, setLoading] = useState(true);
+  const [selectedLanguage, setSelectedLanguage] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
+        let data = [];
+
         if (searchTerm.trim()) {
-          const data = await searchCountryByName(searchTerm.trim());
-          setCountries(data);
+          data = await searchCountryByName(searchTerm.trim());
+        } else if (selectedRegion) {
+          data = await filterByRegion(selectedRegion);
+        } else if (selectedLanguage) {
+          data = await filterByLanguage(selectedLanguage);
         } else {
-          const data = await getAllCountries();
-          setCountries(data);
+          data = await getAllCountries();
         }
+        
+
+        setCountries(data);
       } catch (error) {
         console.error('Error fetching countries:', error);
         setCountries([]);
@@ -27,15 +43,41 @@ const Home = () => {
       }
     };
 
-    const timeout = setTimeout(fetchData, 500); // debounce input
-
+    const timeout = setTimeout(fetchData, 500); // debounce delay
     return () => clearTimeout(timeout);
-  }, [searchTerm]);
+  }, [searchTerm, selectedRegion, selectedLanguage]);
 
   return (
     <div className="container">
       <h2 className="text-center my-4">Countries</h2>
-      <SearchBar value={searchTerm} onChange={setSearchTerm} />
+
+          <SearchBar
+      value={searchTerm}
+      onChange={(value) => {
+        setSearchTerm(value);
+        setSelectedRegion('');
+        setSelectedLanguage('');
+      }}
+    />
+
+    <RegionFilter
+      selectedRegion={selectedRegion}
+      onChange={(region) => {
+        setSelectedRegion(region);
+        setSearchTerm('');
+        setSelectedLanguage('');
+      }}
+    />
+
+    <LanguageFilter
+      selectedLanguage={selectedLanguage}
+      onChange={(lang) => {
+        setSelectedLanguage(lang);
+        setSearchTerm('');
+        setSelectedRegion('');
+      }}
+    />
+
       {loading ? (
         <p className="text-center">Loading...</p>
       ) : (
