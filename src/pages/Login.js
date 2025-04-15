@@ -3,15 +3,19 @@ import { AuthContext } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
-  const [input, setInput] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
+  const [error, setError] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (input.trim()) {
-      login(input.trim());
+    try {
+      await login(email, password);
       navigate('/');
+    } catch (err) {
+      setError('Invalid credentials');
     }
   };
 
@@ -20,12 +24,22 @@ const Login = () => {
       <h3>Login</h3>
       <form onSubmit={handleSubmit}>
         <input
-          type="text"
+          type="email"
           className="form-control mb-2"
-          placeholder="Enter username"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
         />
+        <input
+          type="password"
+          className="form-control mb-2"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
+        {error && <p className="text-danger">{error}</p>}
         <button className="btn btn-primary" type="submit">Login</button>
       </form>
     </div>
