@@ -12,7 +12,11 @@ const Navbar = () => {
         <div className="d-flex">
           {user ? (
             <>
+
               <span className="me-3">👋 {user.email}</span>
+              <Link to="/dashboard" className="btn btn-outline-dark btn-sm me-2">
+                Dashboard
+              </Link>
               <button className="btn btn-outline-danger btn-sm" onClick={logout}>Logout</button>
             </>
           ) : (
