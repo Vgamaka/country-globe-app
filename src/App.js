@@ -11,7 +11,6 @@ function App() {
   return (
     <Router>
       <Navbar />
-      <div className="container mt-4">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/country/:code" element={<CountryDetails />} />
@@ -19,7 +18,6 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/dashboard" element={<Dashboard />} />
         </Routes>
-      </div>
     </Router>
   );
 }

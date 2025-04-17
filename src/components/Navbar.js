@@ -1,33 +1,124 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
+import {
+  FaSignInAlt,
+  FaUserPlus,
+  FaSignOutAlt,
+  FaUserCircle,
+  FaTachometerAlt,
+} from 'react-icons/fa';
 
 const Navbar = () => {
   const { user, logout } = useContext(AuthContext);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 576);
+
+  React.useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 576);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-light bg-light mb-4">
-      <div className="container">
-        <Link className="navbar-brand" to="/">Country App</Link>
-        <div className="d-flex">
+    <nav
+      className="navbar navbar-expand-lg fixed-top px-3 py-2 shadow"
+      style={{
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        backdropFilter: 'blur(8px)',
+        zIndex: 1000,
+      }}
+    >
+      <div className="container-fluid d-flex justify-content-between align-items-center text-white">
+        <Link className="navbar-brand text-white fw-bold fs-4" to="/">
+          Country App
+        </Link>
+
+        <div className="d-flex align-items-center">
           {user ? (
             <>
-
-              <span className="me-3">👋 {user.email}</span>
-              <Link to="/dashboard" className="btn btn-outline-dark btn-sm me-2">
-                Dashboard
-              </Link>
-              <button className="btn btn-outline-danger btn-sm" onClick={logout}>Logout</button>
+              {!isMobile && (
+                <span className="me-3">
+                  <FaUserCircle className="me-1" /> {user.email}
+                </span>
+              )}
+              <HoverButton
+                to="/dashboard"
+                label="Dashboard"
+                icon={<FaTachometerAlt />}
+                isMobile={isMobile}
+              />
+              <HoverButton
+                asButton
+                onClick={logout}
+                label="Logout"
+                icon={<FaSignOutAlt />}
+                isMobile={isMobile}
+                danger
+              />
             </>
           ) : (
             <>
-              <Link to="/login" className="btn btn-outline-primary btn-sm me-2">Login</Link>
-              <Link to="/register" className="btn btn-outline-success btn-sm">Register</Link>
+              <HoverButton
+                to="/login"
+                label="Login"
+                icon={<FaSignInAlt />}
+                isMobile={isMobile}
+              />
+              <HoverButton
+                to="/register"
+                label="Register"
+                icon={<FaUserPlus />}
+                isMobile={isMobile}
+              />
             </>
           )}
         </div>
       </div>
     </nav>
+  );
+};
+
+const HoverButton = ({
+  to,
+  onClick,
+  icon,
+  label,
+  isMobile,
+  asButton = false,
+  danger = false,
+}) => {
+  const [hover, setHover] = useState(false);
+
+  const base = {
+    backgroundColor: isMobile ? 'transparent' : hover ? 'white' : 'black',
+    color: isMobile ? 'white' : hover ? 'black' : 'white',
+    border: isMobile ? 'none' : '1px solid white',
+    transition: 'all 0.3s ease',
+    fontSize: '0.875rem',
+  };
+
+  if (danger) {
+    base.border = isMobile ? 'none' : '1px solid red';
+    base.color = isMobile ? 'white' : hover ? 'red' : 'white';
+    base.backgroundColor = isMobile ? 'transparent' : hover ? 'white' : 'black';
+  }
+
+  const props = {
+    className: 'btn btn-sm me-2',
+    style: base,
+    onMouseEnter: () => setHover(true),
+    onMouseLeave: () => setHover(false),
+    title: label,
+  };
+
+  return asButton ? (
+    <button onClick={onClick} {...props}>
+{isMobile ? React.cloneElement(icon, { size: 20 }) : label}
+    </button>
+  ) : (
+    <Link to={to} {...props}>
+{isMobile ? React.cloneElement(icon, { size: 20 }) : label}
+    </Link>
   );
 };
 

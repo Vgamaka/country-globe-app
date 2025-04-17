@@ -26,3 +26,9 @@ export const addNote = async (countryCode, countryName, text) =>
 
 export const getNotes = async () =>
   await API.get('/notes', getAuthHeaders());
+
+export const deleteNote = async (noteId) =>
+  await API.delete(`/notes/${noteId}`, getAuthHeaders());
+
+export const updateNote = async (noteId, updatedText) =>
+  await API.put(`/notes/${noteId}`, { text: updatedText }, getAuthHeaders());
