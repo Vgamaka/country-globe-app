@@ -17,7 +17,7 @@ const Home = () => {
   const [language, setLanguage] = useState('');
   const [search, setSearch] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [selectedCountry, setSelectedCountry] = useState(null);
+  const [, setSelectedCountry] = useState(null);
   const [countryDetails, setCountryDetails] = useState(null);
   const [note, setNote] = useState('');
   const [savingNote, setSavingNote] = useState(false);
@@ -213,7 +213,7 @@ const Home = () => {
               </button>
               <form onSubmit={handleNoteSubmit}>
                 <textarea
-                  className="form-control mb-2 text-white"
+                  className="form-control mb-2 text-black"
                   style={{ backgroundColor: '#fff' }}
                   placeholder="Write a note..."
                   value={note}
