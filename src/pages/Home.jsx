@@ -394,7 +394,48 @@ const Home = () => {
 
     fetchFiltered();
   }, [search, region, language]);
+  // Center globe whenever filters/search/countries change
+  useEffect(() => {
+    if (!loading && countries.length > 0) {
+      let target = null;
+      if (search.trim() && countries.length === 1) {
+        target = countries[0];
+      } else if (region) {
+        // center on first country when filtering by region
+        target = countries[0];
+      } else if (language) {
+        // center on first country when filtering by language
+        target = countries[0];
+      }
+      if (target) {
+        globeEl.current.pointOfView(
+          { lat: target.lat, lng: target.lng, altitude: region || language ? 2.5 : 1.8 },
+          1200
+        );
+      }
+    }
+  }, [countries, search, region, language, loading]);
 
+  // Center globe whenever countries change in response to filters/search
+  useEffect(() => {
+    if (!loading && countries.length > 0) {
+      let target = null;
+      if (search.trim() && countries.length === 1) {
+        target = countries[0];
+      } else if (region) {
+        // center on first country in region filter
+        target = countries[0];
+      } else if (language) {
+        target = countries[0];
+      }
+      if (target) {
+        globeEl.current.pointOfView(
+          { lat: target.lat, lng: target.lng, altitude: region || language ? 2.5 : 1.8 },
+          1200
+        );
+      }
+    }
+  }, [countries, search, region, language, loading]);
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (
@@ -461,13 +502,13 @@ const Home = () => {
         ref={sidebarRef}
         className="position-absolute p-3"
         style={{
-          top: '80px',
+          top: '60px',
           left: sidebarOpen ? '0' : '-300px',
           width: '280px',
           backgroundColor: 'rgba(0, 0, 0, 0.75)',
           transition: 'left 0.4s ease',
           zIndex: 10,
-          height: 'calc(100% - 100px)',
+          height: 'calc(100%)',
           overflowY: 'auto',
           borderTopRightRadius: '12px',
           borderBottomRightRadius: '12px'
