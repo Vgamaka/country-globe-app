@@ -1,31 +1,22 @@
-import React, { createContext, useState, useEffect } from 'react';
-import { loginUser } from '../services/authService';
+import React, { createContext } from 'react';
+import { useDispatch } from 'react-redux';
+import { clearUser, loginThunk } from '../features/user/userSlice';
+import { useSelector } from 'react-redux';
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.user.user);
 
-  useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem('user'));
-    const storedToken = localStorage.getItem('token');
-    if (storedUser && storedToken) {
-      setUser(storedUser);
-    }
-  }, []);
-
-  const login = async (email, password) => {
-    const res = await loginUser(email, password);
-    const { token, user } = res.data;
-    localStorage.setItem('token', token);
-    localStorage.setItem('user', JSON.stringify(user));
-    setUser(user);
+  const login = (email, password) => {
+    dispatch(loginThunk({ email, password }));
   };
 
   const logout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    setUser(null);
+    dispatch(clearUser());
   };
 
   return (

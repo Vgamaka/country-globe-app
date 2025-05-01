@@ -7,7 +7,7 @@ const api = axios.create({
   timeout: 10000, // timeout in milliseconds
 });
 
-// Use this in all your calls
+
 export const getAllCountries = async () => {
   const response = await api.get('/all?fields=name,capital,region,population,languages,flags,cca3');
   return response.data;

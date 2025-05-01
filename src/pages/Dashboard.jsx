@@ -1,11 +1,11 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { getFavorites, getNotes, deleteNote, updateNote } from '../services/userDataService';
-import { AuthContext } from '../context/AuthContext';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const Dashboard = () => {
-  const { user } = useContext(AuthContext);
+  const user = useSelector((state) => state.user.user);
   const [favorites, setFavorites] = useState([]);
   const [notes, setNotes] = useState([]);
   const [editingNoteId, setEditingNoteId] = useState(null);

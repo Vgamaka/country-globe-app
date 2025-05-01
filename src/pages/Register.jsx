@@ -1,48 +1,41 @@
-import React, { useState, useContext, useRef, useEffect } from 'react';
-import { AuthContext } from '../context/AuthContext';
+import React, { useState, useRef, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { registerUserThunk, clearRegisterStatus } from '../redux/slices/registerSlice';
 import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import 'react-toastify/dist/ReactToastify.css';
 
-const Login = () => {
+const Register = () => {
   const [email, setEmail] = useState('');
   const emailRef = useRef();
   const [password, setPassword] = useState('');
   const [showPass, setShowPass] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
-  const { login } = useContext(AuthContext);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const { status, error } = useSelector((state) => state.register);
 
   useEffect(() => {
     emailRef.current?.focus();
   }, []);
+
   useEffect(() => {
-    const savedEmail = localStorage.getItem('rememberedEmail');
-    if (savedEmail) {
-      setEmail(savedEmail);
-      setRememberMe(true);
+    if (status === 'succeeded') {
+      toast.success('Registered successfully!');
+      setTimeout(() => navigate('/login'), 2000);
+      dispatch(clearRegisterStatus());
+    } else if (status === 'failed') {
+      toast.error(error || 'Registration failed');
+      dispatch(clearRegisterStatus());
     }
-  }, []);
-  
-  const handleSubmit = async (e) => {
+  }, [status, error, navigate, dispatch]);
+
+  const handleSubmit = (e) => {
     e.preventDefault();
-    try {
-      await login(email, password);
-  
-      if (rememberMe) {
-        localStorage.setItem('rememberedEmail', email);
-      } else {
-        localStorage.removeItem('rememberedEmail');
-      }
-  
-      toast.success('Login successful!');
-      setTimeout(() => navigate('/'), 2000);
-    } catch (err) {
-      toast.error('Invalid credentials');
-    }
+    dispatch(registerUserThunk({ email, password }));
   };
-  
 
   return (
     <div style={{ backgroundColor: '#000', minHeight: '100vh', color: 'white', paddingTop: '100px' }}>
@@ -52,12 +45,13 @@ const Login = () => {
           className="p-4 rounded shadow mx-auto animate__animated animate__fadeInDown"
           style={{ backgroundColor: 'rgba(0,0,0,0.85)', maxWidth: '500px' }}
         >
-          <h3 className="mb-4 text-center">Login</h3>
+          <h3 className="mb-4 text-center">Register</h3>
           <form onSubmit={handleSubmit}>
             <div className="mb-3">
-              <label>Email</label>
+              <label htmlFor="email">Email</label>
               <input
                 ref={emailRef}
+                id="email"
                 type="email"
                 className="form-control bg-dark text-white border-secondary"
                 value={email}
@@ -67,9 +61,10 @@ const Login = () => {
             </div>
 
             <div className="mb-3">
-              <label>Password</label>
+              <label htmlFor="password">Password</label>
               <div className="input-group">
                 <input
+                  id="password"
                   type={showPass ? 'text' : 'password'}
                   className="form-control bg-dark text-white border-secondary"
                   value={password}
@@ -118,7 +113,7 @@ const Login = () => {
                 }}
                 type="submit"
               >
-                Login
+                Register
               </button>
             </div>
           </form>
@@ -128,4 +123,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Register;

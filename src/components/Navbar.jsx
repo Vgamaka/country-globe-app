@@ -1,6 +1,7 @@
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { AuthContext } from '../context/AuthContext';
+import { useDispatch, useSelector } from 'react-redux';
+import { clearUser } from '../features/user/userSlice';
 import {
   FaSignInAlt,
   FaUserPlus,
@@ -10,9 +11,16 @@ import {
 } from 'react-icons/fa';
 
 const Navbar = () => {
-  const { user, logout } = useContext(AuthContext);
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.user.user);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 576);
 
+  const logout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    dispatch(clearUser());
+  };
+  
   React.useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 576);
     window.addEventListener('resize', handleResize);

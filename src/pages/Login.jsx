@@ -1,30 +1,49 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { registerUser } from '../services/authService';
+import { useDispatch, useSelector } from 'react-redux';
+import { loginThunk, clearLoginStatus } from '../features/user/userSlice';
 import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import 'react-toastify/dist/ReactToastify.css';
 
-const Register = () => {
+const Login = () => {
   const [email, setEmail] = useState('');
   const emailRef = useRef();
   const [password, setPassword] = useState('');
   const [showPass, setShowPass] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { status, error } = useSelector((state) => state.user);
 
   useEffect(() => {
     emailRef.current?.focus();
+    const savedEmail = localStorage.getItem('rememberedEmail');
+    if (savedEmail) {
+      setEmail(savedEmail);
+      setRememberMe(true);
+    }
   }, []);
 
-  const handleSubmit = async (e) => {
+  useEffect(() => {
+    if (status === 'succeeded') {
+      toast.success('Login successful!');
+      setTimeout(() => navigate('/'), 2000);
+      dispatch(clearLoginStatus());
+    } else if (status === 'failed') {
+      toast.error(error || 'Invalid credentials');
+      dispatch(clearLoginStatus());
+    }
+  }, [status, error, dispatch, navigate]);
+
+  const handleSubmit = (e) => {
     e.preventDefault();
-    try {
-      await registerUser(email, password);
-      toast.success('Registered successfully!');
-      setTimeout(() => navigate('/login'), 2000);
-    } catch (err) {
-      toast.error('User already exists or an error occurred.');
+    dispatch(loginThunk({ email, password }));
+    if (rememberMe) {
+      localStorage.setItem('rememberedEmail', email);
+    } else {
+      localStorage.removeItem('rememberedEmail');
     }
   };
 
@@ -36,12 +55,13 @@ const Register = () => {
           className="p-4 rounded shadow mx-auto animate__animated animate__fadeInDown"
           style={{ backgroundColor: 'rgba(0,0,0,0.85)', maxWidth: '500px' }}
         >
-          <h3 className="mb-4 text-center">Register</h3>
+          <h3 className="mb-4 text-center">Login</h3>
           <form onSubmit={handleSubmit}>
             <div className="mb-3">
-              <label>Email</label>
+              <label htmlFor="email">Email</label>
               <input
                 ref={emailRef}
+                id="email"
                 type="email"
                 className="form-control bg-dark text-white border-secondary"
                 value={email}
@@ -51,9 +71,10 @@ const Register = () => {
             </div>
 
             <div className="mb-3">
-              <label>Password</label>
+              <label htmlFor="password">Password</label>
               <div className="input-group">
                 <input
+                  id="password"
                   type={showPass ? 'text' : 'password'}
                   className="form-control bg-dark text-white border-secondary"
                   value={password}
@@ -61,6 +82,7 @@ const Register = () => {
                   required
                 />
                 <span
+                  data-testid="password-toggle"
                   className="input-group-text bg-dark text-white border-secondary"
                   onClick={() => setShowPass(!showPass)}
                   style={{ cursor: 'pointer' }}
@@ -102,7 +124,7 @@ const Register = () => {
                 }}
                 type="submit"
               >
-                Register
+                Login
               </button>
             </div>
           </form>
@@ -112,4 +134,4 @@ const Register = () => {
   );
 };
 
-export default Register;
+export default Login;

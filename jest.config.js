@@ -1,15 +1,12 @@
 module.exports = {
-    transform: {
-      '^.+\\.(js|jsx)$': 'babel-jest',
-    },
-    transformIgnorePatterns: [
-      '/node_modules/(?!(axios)/)',
-    ],
-    moduleNameMapper: {
-      // Optional: if you later want to add CSS or asset stubs
-      '\\.(css|less)$': 'identity-obj-proxy',
-    },
-    testEnvironment: 'jsdom',
-    extensionsToTreatAsEsm: ['.js'],
-  };
-  
+  transform: {
+    '^.+\\.[jt]sx?$': 'babel-jest',
+  },
+  transformIgnorePatterns: [
+    '/node_modules/(?!(react-globe\\.gl|three-globe|three|axios|d3-.*|internmap)/)'
+  ],  
+  moduleNameMapper: {
+    '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
+  },
+  testEnvironment: 'jsdom',
+};
